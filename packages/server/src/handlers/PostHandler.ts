@@ -91,7 +91,7 @@ export class PostHandler extends BaseHandler {
       await this.options.onIncomingRequest(req, res, id)
     }
 
-    const upload = new Upload({
+    let upload = new Upload({
       id,
       size: upload_length ? Number.parseInt(upload_length, 10) : undefined,
       offset: 0,
@@ -100,7 +100,9 @@ export class PostHandler extends BaseHandler {
 
     if (this.options.onUploadCreate) {
       try {
-        res = await this.options.onUploadCreate(req, res, upload)
+        const afterUploadCreate = await this.options.onUploadCreate(req, res, upload);
+        res = afterUploadCreate[0];
+        upload = afterUploadCreate[1];
       } catch (error) {
         log(`onUploadCreate error: ${error.body}`)
         throw error
