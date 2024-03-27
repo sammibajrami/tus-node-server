@@ -101,8 +101,12 @@ export class PostHandler extends BaseHandler {
     if (this.options.onUploadCreate) {
       try {
         const afterUploadCreate = await this.options.onUploadCreate(req, res, upload);
-        res = afterUploadCreate[0];
-        upload = afterUploadCreate[1];
+        if (afterUploadCreate[0] && afterUploadCreate[1]) {
+          res = afterUploadCreate[0];
+	        upload.metadata = afterUploadCreate[1].metadata;
+        } else {
+          res = afterUploadCreate;
+        }
       } catch (error) {
         log(`onUploadCreate error: ${error.body}`)
         throw error
